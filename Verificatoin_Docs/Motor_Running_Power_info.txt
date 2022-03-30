@@ -1,0 +1,41 @@
+Bus Voltage:   8.15 V
+Shunt Voltage: 76.95 mV
+Load Voltage:  8.23 V
+Current:       858.50 mA
+Power:         6262.00 mW
+
+Bus Voltage:   8.17 V
+Shunt Voltage: 77.34 mV
+Load Voltage:  8.25 V
+Current:       785.30 mA
+Power:         6420.00 mW
+
+Bus Voltage:   8.15 V
+Shunt Voltage: 89.83 mV
+Load Voltage:  8.24 V
+Current:       797.20 mA
+Power:         6580.00 mW
+
+Bus Voltage:   8.16 V
+Shunt Voltage: 80.62 mV
+Load Voltage:  8.24 V
+Current:       782.10 mA
+Power:         6380.00 mW
+
+Bus Voltage:   8.17 V
+Shunt Voltage: 80.41 mV
+Load Voltage:  8.25 V
+Current:       786.50 mA
+Power:         7042.00 mW
+
+Bus Voltage:   8.16 V
+Shunt Voltage: 78.41 mV
+Load Voltage:  8.24 V
+Current:       841.80 mA
+Power:         6862.00 mW
+
+Bus Voltage:   8.16 V
+Shunt Voltage: 81.07 mV
+Load Voltage:  8.25 V
+Current:       803.10 mA
+Power:         6102.00 mW
