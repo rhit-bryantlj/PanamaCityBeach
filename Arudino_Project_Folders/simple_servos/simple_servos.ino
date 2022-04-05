@@ -24,6 +24,7 @@ void setup() {
   ESP32PWM::allocateTimer(2);
   ESP32PWM::allocateTimer(3);
   Serial.begin(115200);
+  Serial.println("sup");
   while(!Serial) {
     // will pause Zero, Leonardo, etc until serial console opens
     delay(1);
@@ -38,15 +39,26 @@ void setup() {
   }
   
   
-//  steeringServo.attach(servoPin); // attaches the servo on pin 18 to the servo object
+
+  // Steering Servo Setup
+  steeringServo.setPeriodHertz(50);
+  steeringServo.attach(servoPin, 1000, 2000);
+ // attaches the servo on pin 18 to the servo object
 
   motorServo.setPeriodHertz(50);    // standard 50 hz servo
-  motorServo.attach(motorPin, 1000, 2000);
+  motorServo.attach(motorPin, 500, 2400);
   delay(500);
-  motorServo.write(120);
+  motorSpeed = 45;
 }
 
 void loop() {
+  if (Serial.available()> 0) {
+    //int k = Serial.parseInt();
+    //if(k >0){
+      motorSpeed = Serial.parseInt();
+      Serial.read();
+    //}
+  }
   shuntvoltage = ina219.getShuntVoltage_mV();
   busvoltage = ina219.getBusVoltage_V();
   current_mA = ina219.getCurrent_mA();
@@ -58,8 +70,14 @@ void loop() {
   Serial.print("Load Voltage:  "); Serial.print(loadvoltage); Serial.println(" V");
   Serial.print("Current:       "); Serial.print(current_mA); Serial.println(" mA");
   Serial.print("Power:         "); Serial.print(power_mW); Serial.println(" mW");
+  Serial.print("Speed:         "); Serial.print(motorSpeed); Serial.println(" fast");
   Serial.println("");
 
+//  if(motorSpeed < 110){
+//    motorSpeed +=5;
+//  }
+  motorServo.write(motorSpeed);
+   
   delay(2000);
 
 
@@ -69,14 +87,16 @@ void loop() {
 //  delay(2000);
 //  motorServo.write(0);
 //  delay(2000);
+
+ 
   
     // Sweep servo back and forth
-//  for (pos = 120; pos <= 160; pos += 1) { // goes from 0 degrees to 180 degrees
+//  for (pos = 0; pos <= 170; pos += 1) { // goes from 0 degrees to 180 degrees
 //    // in steps of 1 degree
 //    steeringServo.write(pos);    // tell servo to go to position in variable 'pos'
 //    delay(15);             // waits 15ms for the servo to reach the position
 //  }
-//  for (pos = 160; pos >= 20; pos -= 1) { // goes from 180 degrees to 0 degrees
+//  for (pos = 170; pos >= 0; pos -= 1) { // goes from 180 degrees to 0 degrees
 //    steeringServo.write(pos);    // tell servo to go to position in variable 'pos'
 //    delay(15);             // waits 15ms for the servo to reach the position
 //  }

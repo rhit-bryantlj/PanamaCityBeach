@@ -56,11 +56,21 @@ void setup() {
 
   //Motor Servo Setup
   motorServo.setPeriodHertz(50);
-  motorServo.attach(motorPin, 1000,2000);
+  motorServo.attach(motorPin, 500,2400);
   delay(20);
-  motorServo.write(0);
+  motorServo.write(45);
+     delay(2000);
+    motorServo.write(55);
+    delay(2000);
+    motorServo.write(60);
+    delay(2000);
+    motorServo.write(65);
+    delay(2000);
+    motorServo.write(68);
 }
 
+int prev_millis = 0;
+HUSKYLENSResult result;
 void loop() {
     cur_millis = millis();
     if (!huskylens.request()) Serial.println(F("Fail to request data from HUSKYLENS, recheck the connection!"));
@@ -70,43 +80,62 @@ void loop() {
     {
         while (huskylens.available())
         {
-            HUSKYLENSResult result = huskylens.read();
-            followLine(result);
-        }
+            result = huskylens.read();
+        } 
   //      delay(15);
     }
-     readBluetooth();
-     while(millis() < cur_millis + 10){
-        //wait approx. 15 ms
-    }
+
+    //if(cur_millis - prev_millis > ){
+     // prev_millis = cur_millis;
+      followLine(result);
+    //}
+   //  readBluetooth();
+//     while(millis() < cur_millis + 5){
+//        //wait approx. 15 ms
+//    }
 }
 
 void followLine(HUSKYLENSResult result){//Put back result
-  double xDiff;
+  int xDiff;
   double yDiff;
   int theta;
   int servoAngle;
 
   if (result.command == COMMAND_RETURN_ARROW){ // check to see if result returned is an arrow following ling
     //calculations
-    xDiff = result.xTarget - result.xOrigin;
-    yDiff = result.yOrigin - result.yTarget;
-    theta = acos(xDiff/yDiff) * 180 / Pi;
-    SerialBT.write(theta);
+    xDiff = (int)result.xTarget - 160;
+//    yDiff = result.yOrigin - result.yTarget;
+//    theta = acos(xDiff/yDiff) * 180 / Pi;
+//    int angle = theta;
+//    SerialBT.write(theta);
 
-    if(theta > 95 && theta< 150){
-      steeringServo.write(theta + 10);
-    }
-    if(theta < 85 && theta > 30) {
-      steeringServo.write(theta - 10);
-    }else{
-      steeringServo.write(theta);
-    }
+//    theta = map(theta, 0, 180, 10, 170);
+//    theta = constrain(theta, 10, 170);
+//    steeringServo.write(theta);
+//    if(theta > 95 && theta< 150){
+//      steeringServo.write(theta + 10);
+//    }
+//    if(theta < 85 && theta > 30) {
+//      steeringServo.write(theta - 10);
+//    }else{
+//      steeringServo.write(theta);
+//    }
+      theta = map(xDiff, -80, 80, 170, 10);
+      //theta = constrain(xDiff, 0, 180);
+      //steeringServo.write(theta);
 
-    if((BT_ended != 1) && (theta > 100 || theta < 75)){
-      motorSpeed = 55;
-      motorServo.write(55);
-    } 
+//    if(/*(BT_ended != 1) &&*/ (theta > 120 || theta < 60)){
+//      //motorSpeed = 55;
+//      motorServo.write(65);
+//      delay(50);
+//      motorServo.write(70);
+//      delay(50);
+//    }
+
+    char buffer[50];
+    sprintf(buffer, "xTarget: %d  diff: %d  theta: %d  ", result.xTarget, xDiff, theta);
+    //Serial.println(buffer);
+    steeringServo.write(theta);
 //    else if(BT_ended != 1){
 //      motorServo.write(70);
 //    }
