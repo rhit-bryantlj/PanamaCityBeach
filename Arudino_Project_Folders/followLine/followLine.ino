@@ -23,6 +23,8 @@ const double Pi = 3.14159;
 // global variables
 int pos = 0;
 int motorSpeed = 0;
+int cur_millis = 0;
+int BT_ended = 1;
 
 void followLine(HUSKYLENSResult result);
 void readBluetooth();
@@ -56,28 +58,27 @@ void setup() {
   motorServo.setPeriodHertz(50);
   motorServo.attach(motorPin, 1000,2000);
   delay(20);
+  motorServo.write(0);
 }
 
 void loop() {
-  if (!huskylens.request()) Serial.println(F("Fail to request data from HUSKYLENS, recheck the connection!"));
-  else if(!huskylens.isLearned()) Serial.println(F("Nothing learned, press learn button on HUSKYLENS to learn one!"));
-//  else if(!huskylens.available()) Serial.println(F("No block or arrow appears on the screen!"));
-  else
-  {
-      while (huskylens.available())
-      {
-          HUSKYLENSResult result = huskylens.read();
-          followLine(result);
-      }
-//      delay(15);
-  }
-
-//  if(huskylens.available()){
-//    HUSKYLENSResult result = huskylens.read();
-//    followLine(result);
-//  }
-  readBluetooth();
-  delay(15);
+    cur_millis = millis();
+    if (!huskylens.request()) Serial.println(F("Fail to request data from HUSKYLENS, recheck the connection!"));
+    else if(!huskylens.isLearned()) Serial.println(F("Nothing learned, press learn button on HUSKYLENS to learn one!"));
+  //  else if(!huskylens.available()) Serial.println(F("No block or arrow appears on the screen!"));
+    else
+    {
+        while (huskylens.available())
+        {
+            HUSKYLENSResult result = huskylens.read();
+            followLine(result);
+        }
+  //      delay(15);
+    }
+     readBluetooth();
+     while(millis() < cur_millis + 10){
+        //wait approx. 15 ms
+    }
 }
 
 void followLine(HUSKYLENSResult result){//Put back result
@@ -91,30 +92,25 @@ void followLine(HUSKYLENSResult result){//Put back result
     xDiff = result.xTarget - result.xOrigin;
     yDiff = result.yOrigin - result.yTarget;
     theta = acos(xDiff/yDiff) * 180 / Pi;
-//    Serial.println(String()+F("xDiff: ") + xDiff + F(" yDiff: ") + yDiff + F(" theta: ") + theta);
+    SerialBT.write(theta);
 
-    if(theta > 160){
-      steeringServo.write(160);
+    if(theta > 95 && theta< 150){
+      steeringServo.write(theta + 10);
     }
-    if(theta < 20) {
-      steeringServo.write(20);
+    if(theta < 85 && theta > 30) {
+      steeringServo.write(theta - 10);
     }else{
       steeringServo.write(theta);
     }
 
-//    if(theta > 120 || theta < 60){
-//      motorServo.write(60);
-//    } else{
+    if((BT_ended != 1) && (theta > 100 || theta < 75)){
+      motorSpeed = 55;
+      motorServo.write(55);
+    } 
+//    else if(BT_ended != 1){
 //      motorServo.write(70);
 //    }
   }
-  
-//  if (result.command == COMMAND_RETURN_ARROW){
-//      Serial.println(String()+F("Arrow:xOrigin=")+result.xOrigin+F(",yOrigin=")+result.yOrigin+F(",xTarget=")+result.xTarget+F(",yTarget=")+result.yTarget+F(",ID=")+result.ID);
-//  }
-//  else{
-//      Serial.println("Object unknown!");
-//  }
 }
 
 void readBluetooth(){
@@ -125,10 +121,14 @@ void readBluetooth(){
     int letter = SerialBT.read();
     Serial.write(letter);
     if(letter == 'S'){
-      motorServo.write(70);
+      BT_ended = 0;
+      motorSpeed = 60;
+      motorServo.write(motorSpeed);
     }
     if(letter == 'E'){
-      motorServo.write(0);
+      BT_ended = 1;
+      motorSpeed = 0;
+      motorServo.write(motorSpeed);
     }
   }
 }
