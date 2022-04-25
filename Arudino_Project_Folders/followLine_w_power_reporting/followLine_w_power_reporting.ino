@@ -86,15 +86,22 @@ void setup() {
   motorServo.setPeriodHertz(50);
   motorServo.attach(motorPin, 500,2400);
   delay(50);
-  motorServo.write(55);
-  delay(250);
-  motorServo.write(65);
-  delay(250);
-  motorServo.write(75);
+  motorServo.write(45);
   delay(1000);
-  motorServo.write(90);
+  motorServo.write(50);
+  delay(1000);
+  motorServo.write(55);
+  delay(1000);
+  motorServo.write(60);
   delay(1000);
   
+//  motorServo.write(65);
+//  delay(250);
+//  motorServo.write(75);
+//  delay(1000);
+//  motorServo.write(90);
+//  delay(1000);
+//  
   //record when the program starts for a 2 minute run
   last_power_read = millis();
   start_race_millis = millis();
@@ -141,7 +148,11 @@ void followLine(HUSKYLENSResult result){//Put back result
   if (result.command == COMMAND_RETURN_ARROW){ // check to see if result returned is an arrow following ling
     //calculations
     xDiff = (int)result.xTarget - 160;
-    theta = map(xDiff, -80, 80, 170, 10);
+    if(abs(result.xTarget-result.xOrigin) < 30 && abs(xDiff) < 120){
+      theta = map(xDiff, -80, 80, 110, 70);
+    } else{
+      theta = map(xDiff, -80, 80, 160, 20);
+    }
     steeringServo.write(theta);
   }
 }
@@ -178,7 +189,7 @@ void readBluetooth(){
       case 'S':
         BT_started = 1;
         BT_ended = 0;
-        motorSpeed = 65;
+        motorSpeed = 67;
         motorServo.write(motorSpeed);
         break;
       case 'E':
