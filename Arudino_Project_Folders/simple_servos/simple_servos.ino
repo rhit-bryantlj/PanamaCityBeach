@@ -55,7 +55,8 @@ void loop() {
   if (Serial.available()> 0) {
     //int k = Serial.parseInt();
     //if(k >0){
-      motorSpeed = Serial.parseInt();
+      //motorSpeed = Serial.parseInt();
+      pos = Serial.parseInt();
       Serial.read();
     //}
   }
@@ -70,13 +71,14 @@ void loop() {
   Serial.print("Load Voltage:  "); Serial.print(loadvoltage); Serial.println(" V");
   Serial.print("Current:       "); Serial.print(current_mA); Serial.println(" mA");
   Serial.print("Power:         "); Serial.print(power_mW); Serial.println(" mW");
-  Serial.print("Speed:         "); Serial.print(motorSpeed); Serial.println(" fast");
+  Serial.print("Angle:         "); Serial.print(pos); Serial.println(" degrees");
   Serial.println("");
 
 //  if(motorSpeed < 110){
 //    motorSpeed +=5;
 //  }
   motorServo.write(motorSpeed);
+  steeringServo.write(pos);
    
   delay(2000);
 
@@ -93,7 +95,7 @@ void loop() {
     // Sweep servo back and forth
 //  for (pos = 0; pos <= 170; pos += 1) { // goes from 0 degrees to 180 degrees
 //    // in steps of 1 degree
-//    steeringServo.write(pos);    // tell servo to go to position in variable 'pos'
+        // tell servo to go to position in variable 'pos'
 //    delay(15);             // waits 15ms for the servo to reach the position
 //  }
 //  for (pos = 170; pos >= 0; pos -= 1) { // goes from 180 degrees to 0 degrees

@@ -28,6 +28,7 @@ const int HALF_SEC = 500;
 // global variables
 int pos = 0;
 int motorSpeed = 0;
+int bluetoothSpeed = 0;
 int BT_ended = 0;
 int BT_started = 0;
 TaskHandle_t Task1, Task2;
@@ -117,6 +118,13 @@ void setup() {
 //  xTaskCreatePinnedToCore(mainLoop, "mainLoop", 1000, NULL, 1, &Task1, 0);
   xTaskCreatePinnedToCore(powerReadingLoop,"powerLoop",1000,NULL,0,&Task2,0);
   
+//  motorServo.write(65);
+//  delay(250);
+//  motorServo.write(75);
+//  delay(1000);
+//  motorServo.write(90);
+//  delay(1000);
+//  
   //record when the program starts for a 2 minute run
   last_power_read = millis();
   start_race_millis = millis();
@@ -142,7 +150,10 @@ void loop() {
               result = huskylens.read();
           } 
       }
+      if(!BT_ended){
         followLine(result);
+      }
+      motorServo.write(motorSpeed);
       //}
        readBluetooth();
 //       while(millis() < cur_millis + 5){
@@ -163,7 +174,13 @@ void followLine(HUSKYLENSResult result){//Put back result
   if (result.command == COMMAND_RETURN_ARROW){ // check to see if result returned is an arrow following ling
     //calculations
     xDiff = (int)result.xTarget - 160;
-    theta = map(xDiff, -80, 80, 170, 10);
+    if(abs(result.xTarget-result.xOrigin) < 30 && abs(xDiff) < 120){
+      theta = map(xDiff, -80, 80, 110, 70);
+      motorSpeed = bluetoothSpeed;
+    } else{
+      theta = map(xDiff, -80, 80, 160, 20);
+      motorSpeed = 67;
+    }
     steeringServo.write(theta);
   }
 }
@@ -178,34 +195,37 @@ void readBluetooth(){
 
     switch(letter){
       case '6':
-        motorServo.write(65);
+        bluetoothSpeed =67;
         Serial.println("Wrote moter speed to 65");
         break;
       case '7':
-        motorServo.write(70);
+        bluetoothSpeed =70;
         Serial.println("Wrote moter speed to 70");
         break;
       case '8':
-        motorServo.write(80);
+        bluetoothSpeed =80;
         Serial.println("Wrote moter speed to 80");
         break;
       case '9':
-        motorServo.write(90);
+        bluetoothSpeed =90;
         Serial.println("Wrote moter speed to 90");
         break;
       case '0':
-        motorServo.write(0);
+        motorSpeed = 0;
+        bluetoothSpeed = 0;
         Serial.println("Wrote moter speed to 0");
         break;
       case 'S':
         BT_started = 1;
         BT_ended = 0;
-        motorSpeed = 65;
+        motorSpeed = 67;
+        bluetoothSpeed = 67;
         motorServo.write(motorSpeed);
         break;
       case 'E':
         BT_ended = 1;
         motorSpeed = 0;
+        bluetoothSpeed = 0;
         motorServo.write(motorSpeed);
         break;
     }
