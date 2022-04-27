@@ -28,6 +28,7 @@ const int HALF_SEC = 500;
 // global variables
 int pos = 0;
 int motorSpeed = 0;
+int bluetoothSpeed = 0;
 int BT_ended = 0;
 int BT_started = 0;
 
@@ -127,7 +128,10 @@ void loop() {
               result = huskylens.read();
           } 
       }
+      if(!BT_ended){
         followLine(result);
+      }
+      motorServo.write(motorSpeed);
       //}
        readBluetooth();
 //       while(millis() < cur_millis + 5){
@@ -150,8 +154,10 @@ void followLine(HUSKYLENSResult result){//Put back result
     xDiff = (int)result.xTarget - 160;
     if(abs(result.xTarget-result.xOrigin) < 30 && abs(xDiff) < 120){
       theta = map(xDiff, -80, 80, 110, 70);
+      motorSpeed = bluetoothSpeed;
     } else{
       theta = map(xDiff, -80, 80, 160, 20);
+      motorSpeed = 67;
     }
     steeringServo.write(theta);
   }
@@ -167,34 +173,37 @@ void readBluetooth(){
 
     switch(letter){
       case '6':
-        motorServo.write(65);
+        bluetoothSpeed =67;
         Serial.println("Wrote moter speed to 65");
         break;
       case '7':
-        motorServo.write(70);
+        bluetoothSpeed =70;
         Serial.println("Wrote moter speed to 70");
         break;
       case '8':
-        motorServo.write(80);
+        bluetoothSpeed =80;
         Serial.println("Wrote moter speed to 80");
         break;
       case '9':
-        motorServo.write(90);
+        bluetoothSpeed =90;
         Serial.println("Wrote moter speed to 90");
         break;
       case '0':
-        motorServo.write(0);
+        motorSpeed = 0;
+        bluetoothSpeed = 0;
         Serial.println("Wrote moter speed to 0");
         break;
       case 'S':
         BT_started = 1;
         BT_ended = 0;
         motorSpeed = 67;
+        bluetoothSpeed = 67;
         motorServo.write(motorSpeed);
         break;
       case 'E':
         BT_ended = 1;
         motorSpeed = 0;
+        bluetoothSpeed = 0;
         motorServo.write(motorSpeed);
         break;
     }
