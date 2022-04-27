@@ -30,6 +30,7 @@ int pos = 0;
 int motorSpeed = 0;
 int BT_ended = 0;
 int BT_started = 0;
+TaskHandle_t Task1, Task2;
 
 // power variables
 float shuntvoltage = 0;
@@ -48,6 +49,23 @@ void followLine(HUSKYLENSResult result);
 void readBluetooth();
 void reportPower();
 void endLoop();
+
+
+void powerReadingLoop(void * parameter){
+  for(;;){
+//  Serial.print("powerReading is running on Core: ");Serial.println( xPortGetCoreID());
+    while(BT_started == 0){
+      //wait here until race started with bluetooth
+  //    readBluetooth();
+      Serial.println(BT_started);
+    }
+    if(millis() > (last_power_read + HALF_SEC)){
+        reportPower();
+        last_power_read = millis();
+      }
+  }
+}
+
 
 void setup() {
   Serial.begin(115200);
@@ -86,14 +104,18 @@ void setup() {
   motorServo.setPeriodHertz(50);
   motorServo.attach(motorPin, 500,2400);
   delay(50);
+  motorServo.write(45);
+  delay(1000);
+  motorServo.write(50);
+  delay(1000);
   motorServo.write(55);
-  delay(250);
-  motorServo.write(65);
-  delay(250);
-  motorServo.write(75);
   delay(1000);
-  motorServo.write(90);
+  motorServo.write(60);
   delay(1000);
+  motorServo.write(0);
+  
+//  xTaskCreatePinnedToCore(mainLoop, "mainLoop", 1000, NULL, 1, &Task1, 0);
+  xTaskCreatePinnedToCore(powerReadingLoop,"powerLoop",1000,NULL,0,&Task2,0);
   
   //record when the program starts for a 2 minute run
   last_power_read = millis();
@@ -126,10 +148,10 @@ void loop() {
 //       while(millis() < cur_millis + 5){
 //          //wait approx. 15 ms
 //      }
-    if(millis() > (last_power_read + HALF_SEC)){
-      reportPower();
-      last_power_read = millis();
-    }
+//    if(millis() > (last_power_read + HALF_SEC)){
+//      reportPower();
+//      last_power_read = millis();
+//    }
   }
   endLoop();
 }
@@ -203,9 +225,7 @@ void reportPower(){
 //  Serial.println(powerBuffer);
   const uint8_t* sendBuf = (uint8_t*)powerBuffer;
 //  Serial.println(sendBuf);
-  SerialBT.write(sendBuf, 50);
-
-    
+  SerialBT.write(sendBuf, 50); 
 }
 
 void endLoop(){
@@ -215,3 +235,7 @@ void endLoop(){
     readBluetooth();
   }
 }
+
+//void mainLoop(void * parameter){
+//  Serial.print("mainLoop is running on Core: ");Serial.println( xPortGetCoreID());
+//}
