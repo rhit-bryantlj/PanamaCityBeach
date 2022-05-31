@@ -2,12 +2,12 @@ import re
 from xml.etree.ElementTree import tostring
 
 
-outputFile = open('test_out.csv','w')
+outputFile = open('CompetitionOutData/oval-ccw.csv','w')
 
 outputFile.write("Time (s),shunt V (mV),bus V ,current mA,power mW,load V \n")
 timeNum = 0.5
 
-with open('fig-8-pwr-67-67-10.8-laps.txt', 'r', errors='replace') as f:
+with open('CompetitionInData/oval-ccw.txt', 'r', errors='replace') as f:
     lines = f.readlines()
     for line in lines:
         # print(line)

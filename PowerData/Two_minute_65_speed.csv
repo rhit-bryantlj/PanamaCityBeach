@@ -1,4 +1,4 @@
-Time (s),shunt V (mV),bus V ,current mA,power mW,load V,,,
+Time (s),shunt V (mV),bus V ,current mA,power mW,load V,,12 laps,
 0.5,34.5,8.05,344.2,2776,8.08,,Avg Table,
 1,83.78,7.96,860.8,6856,8.05,,shunt V (mV),70.59607595
 1.5,70.79,7.98,708.4,5734,8.05,,current mA,706.0485232
